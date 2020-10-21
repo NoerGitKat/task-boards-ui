@@ -1,0 +1,24 @@
+{
+  "name": "task-boards-ui",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "ts:watch": "tsc -w",
+    "dev": "nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NoerGitKat/task-boards-ui.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NoerGitKat/task-boards-ui/issues"
+  },
+  "homepage": "https://github.com/NoerGitKat/task-boards-ui#readme",
+  "devDependencies": {
+    "typescript": "^4.0.3"
+  }
+}
