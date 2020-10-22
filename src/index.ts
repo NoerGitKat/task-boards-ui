@@ -6,7 +6,7 @@ const addItemContainers = Array.from(
 const addItems = Array.from(document.querySelectorAll(".add-item"));
 
 // Item Lists
-const itemLists = Array.from(document.querySelectorAll(".drag-item-list"));
+const listColumns = Array.from(document.querySelectorAll(".drag-item-list"));
 const backlogList: HTMLElement | null = document.getElementById("backlog-list");
 const progressList: HTMLElement | null = document.getElementById(
   "progress-list"
@@ -28,6 +28,8 @@ let boards: Array<string[]> = [];
 let lists: Array<HTMLElement | null> = [];
 
 // Drag Functionality
+let draggedItem: any;
+let currentColumn: number;
 
 // Get Arrays from localStorage if available, set default values if not
 function getSavedColumns(): void {
@@ -72,7 +74,102 @@ function createItemEl(
   const listEl = document.createElement("li");
   listEl.classList.add("drag-item");
   listEl.textContent = task;
+  listEl.draggable = true;
+  listEl.setAttribute("ondragstart", "drag(event)");
   columnEl?.append(listEl);
+}
+
+function drag(event: { target: Event }) {
+  draggedItem = event.target;
+}
+
+function dragEnter(column: number) {
+  listColumns[column].classList.add("over");
+  currentColumn = column;
+}
+
+function allowDrop(event: Event) {
+  event.preventDefault();
+}
+
+function drop(event: Event) {
+  event.preventDefault();
+  // Remove bg/padding
+  listColumns.map((column) => column.classList.remove("over"));
+  // Add Item to column
+  const parent = listColumns[currentColumn];
+  parent.appendChild(draggedItem);
+  updateLists();
+}
+
+// Update lists
+function updateLists() {
+  // boards = [
+  //   backlogListArray,
+  //   progressListArray,
+  //   completeListArray,
+  //   onHoldListArray,
+  // ];
+  // const newBoards = boards.map((board, index) => {
+  //   board = [];
+  //   const column = listColumns[index];
+
+  //   if (column) {
+  //     let text: string | null;
+  //     for (let index = 0; index < column.children.length; index++) {
+  //       text = column.children[index].textContent;
+
+  //       if (text) {
+  //         board.push(text);
+  //       }
+  //     }
+  //   }
+
+  //   return board;
+  // });
+
+  // boards = newBoards;
+  backlogListArray = [];
+  if (backlogList) {
+    let listElText: string | null;
+    for (let i = 0; i < backlogList.children.length; i++) {
+      listElText = backlogList.children[i].textContent;
+      if (listElText) {
+        backlogListArray.push(listElText);
+      }
+    }
+  }
+  progressListArray = [];
+  if (progressList) {
+    let listElText: string | null;
+    for (let i = 0; i < progressList.children.length; i++) {
+      listElText = progressList.children[i].textContent;
+      if (listElText) {
+        progressListArray.push(listElText);
+      }
+    }
+  }
+  completeListArray = [];
+  if (completeList) {
+    let listElText: string | null;
+    for (let i = 0; i < completeList.children.length; i++) {
+      listElText = completeList.children[i].textContent;
+      if (listElText) {
+        completeListArray.push(listElText);
+      }
+    }
+  }
+  onHoldListArray = [];
+  if (onHoldList) {
+    let listElText: string | null;
+    for (let i = 0; i < onHoldList.children.length; i++) {
+      listElText = onHoldList.children[i].textContent;
+      if (listElText) {
+        onHoldListArray.push(listElText);
+      }
+    }
+  }
+  updateDOM();
 }
 
 // Update Columns in DOM - Reset HTML, Filter Array, Update localStorage
@@ -103,6 +200,8 @@ function updateDOM() {
   });
 
   // Run getSavedColumns only once, Update Local Storage
+  updatedOnLoad = true;
+  updateSavedColumns();
 }
 
 updateDOM();
