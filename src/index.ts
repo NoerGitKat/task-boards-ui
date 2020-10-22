@@ -17,12 +17,15 @@ const completeList: HTMLElement | null = document.getElementById(
 const onHoldList: HTMLElement | null = document.getElementById("on-hold-list");
 
 // Items
+let updatedOnLoad = false;
 
 // Initialize Arrays
 let backlogListArray: string[] = [];
 let progressListArray: string[] = [];
 let completeListArray: string[] = [];
 let onHoldListArray: string[] = [];
+let boards: Array<string[]> = [];
+let lists: Array<HTMLElement | null> = [];
 
 // Drag Functionality
 
@@ -41,31 +44,65 @@ function getSavedColumns(): void {
   }
 }
 
+getSavedColumns();
+updateSavedColumns();
+
 // Set localStorage Arrays
 function updateSavedColumns(): void {
-  localStorage.setItem("backlogItems", JSON.stringify(backlogListArray));
-  localStorage.setItem("progressItems", JSON.stringify(progressListArray));
-  localStorage.setItem("completeItems", JSON.stringify(completeListArray));
-  localStorage.setItem("onHoldItems", JSON.stringify(onHoldListArray));
+  boards = [
+    backlogListArray,
+    progressListArray,
+    completeListArray,
+    onHoldListArray,
+  ];
+  const boardNames = ["backlog", "progress", "complete", "onHold"];
+  boards.map((board, index) =>
+    localStorage.setItem(`${boardNames[index]}Items`, JSON.stringify(board))
+  );
 }
 
 // Create DOM Elements for each list item
-function createItemEl(columnEl, column, item, index) {
-  console.log("columnEl:", columnEl);
-  console.log("column:", column);
-  console.log("item:", item);
-  console.log("index:", index);
+function createItemEl(
+  columnEl: HTMLElement | null,
+  column: number,
+  task: string,
+  index: number
+) {
   // List Item
   const listEl = document.createElement("li");
   listEl.classList.add("drag-item");
+  listEl.textContent = task;
+  columnEl?.append(listEl);
 }
 
 // Update Columns in DOM - Reset HTML, Filter Array, Update localStorage
 function updateDOM() {
   // Check localStorage once
-  // Backlog Column
-  // Progress Column
-  // Complete Column
-  // On Hold Column
+  if (!updatedOnLoad) {
+    getSavedColumns();
+  }
+
+  lists = [backlogList, progressList, completeList, onHoldList];
+  boards = [
+    backlogListArray,
+    progressListArray,
+    completeListArray,
+    onHoldListArray,
+  ];
+
+  // Update List
+  lists.map((list) => {
+    if (list) {
+      list.textContent = "";
+    }
+  });
+
+  // Update Board
+  boards.map((board, index) => {
+    board.map((task) => createItemEl(lists[index], 0, task, index));
+  });
+
   // Run getSavedColumns only once, Update Local Storage
 }
+
+updateDOM();
